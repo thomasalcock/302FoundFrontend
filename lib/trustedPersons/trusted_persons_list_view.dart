@@ -68,10 +68,7 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AppBarWidget(title: 'Notfallkontakte'),
-      ),
+      appBar: AppBarWidget(title: 'Notfallkontakte'),
       body: _trustedPersons.isEmpty
           ? Center(
               child: _isLoading
