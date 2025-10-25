@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:threeotwo_found_frontend/trusted_persons_list_view.dart';
+import 'package:threeotwo_found_frontend/trustedPersons/trusted_persons_list_view.dart';
 
 void main() {
   runApp(const MyApp());
