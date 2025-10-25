@@ -13,6 +13,7 @@ class TrustedPersonForm extends StatefulWidget {
 class TrustedPersonFormState extends State<TrustedPersonForm> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void dispose() {
@@ -38,14 +39,22 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
           decoration: const InputDecoration(labelText: 'Telefonnummer'),
           keyboardType: TextInputType.phone,
         ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _emailController,
+          decoration: const InputDecoration(labelText: 'E-Mail-Adresse'),
+          keyboardType: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 24),
         ElevatedButton(
           onPressed: () {
             if (_nameController.text.trim().isNotEmpty &&
-                _phoneController.text.trim().isNotEmpty) {
+                _phoneController.text.trim().isNotEmpty &&
+                _emailController.text.trim().isNotEmpty) {
               final person = TrustedPerson(
                 name: _nameController.text.trim(),
                 phoneNumber: _phoneController.text.trim(),
+                email: _emailController.text.trim(),
               );
               widget.onPersonAdded(person);
             } else {

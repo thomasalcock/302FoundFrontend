@@ -12,6 +12,9 @@ class TrustedPersonsListView extends StatefulWidget {
 
 class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   final List<TrustedPerson> _trustedPersons = [];
+  bool _isLoading = true;
+  bool _isAdding = false;
+  int _isDeleting = -1;
 
   @override
   void initState() {
@@ -23,15 +26,40 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       _trustedPersons.addAll([
-        TrustedPerson(name: 'Max Mustermann', phoneNumber: '0123456789'),
-        TrustedPerson(name: 'Erika Mustermann', phoneNumber: '9876543210'),
+        TrustedPerson(
+          name: 'Max Mustermann',
+          phoneNumber: '0123456789',
+          email: 'max@mustermann.de',
+        ),
+        TrustedPerson(
+          name: 'Erika Mustermann',
+          phoneNumber: '9876543210',
+          email: 'erika@mustermann.de',
+        ),
       ]);
+      _isLoading = false;
     });
   }
 
-  void _addTrustedPerson(TrustedPerson person) {
+  Future<void> _addTrustedPerson(TrustedPerson person) async {
+    setState(() {
+      _isAdding = true;
+    });
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       _trustedPersons.add(person);
+      _isAdding = false;
+    });
+  }
+
+  Future<void> _deleteTrustedPerson(int index) async {
+    setState(() {
+      _isDeleting = index;
+    });
+    await Future.delayed(const Duration(seconds: 2));
+    setState(() {
+      _trustedPersons.removeAt(index);
+      _isDeleting = -1;
     });
   }
 
@@ -43,29 +71,49 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
         child: AppBarWidget(title: 'Notfallkontakte'),
       ),
       body: _trustedPersons.isEmpty
-          ? const Center(
-              child: Text(
-                'Keine Vertrauenspersonen hinzugefügt.\nTippen Sie auf das + Symbol, um eine hinzuzufügen.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
+          ? Center(
+              child: _isLoading
+                  ? CircularProgressIndicator()
+                  : Text(
+                      'Keine Vertrauenspersonen hinzugefügt.\nTippen Sie auf das + Symbol, um eine hinzuzufügen.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16),
+                    ),
             )
           : ListView.builder(
-              itemCount: _trustedPersons.length,
+              itemCount: _isAdding
+                  ? _trustedPersons.length + 1
+                  : _trustedPersons.length,
               itemBuilder: (context, index) {
+                if (_isAdding && index == _trustedPersons.length) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 final person = _trustedPersons[index];
-                return ListTile(
-                  leading: const Icon(Icons.person),
-                  title: Text(person.name),
-                  subtitle: Text('Telefonnummer: ${person.phoneNumber}'),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      setState(() {
-                        _trustedPersons.removeAt(index);
-                      });
-                    },
-                  ),
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text(person.name),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Tel.: ${person.phoneNumber}'),
+                          Text('Mail: ${person.email}'),
+                        ],
+                      ),
+                      isThreeLine: true,
+                      trailing: IconButton(
+                        icon: _isDeleting == index
+                            ? const CircularProgressIndicator()
+                            : const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          _deleteTrustedPerson(index);
+                        },
+                      ),
+                    ),
+                    const Divider(),
+                  ],
                 );
               },
             ),
