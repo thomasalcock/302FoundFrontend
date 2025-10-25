@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:threeotwo_found_frontend/trustedPersons/trusted_persons_list_view.dart';
+import 'package:threeotwo_found_frontend/account/account_view.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
-
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,23 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const LostAndFound(title: 'Hessentag Fulda - Lost and Found'),
+      home: TrustedPersonsListView(),
+      routes: {'/account': (context) => const AccountView()},
     );
-  }
-}
-
-class LostAndFound extends StatefulWidget {
-  const LostAndFound({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<LostAndFound> createState() => _LostAndFoundState();
-}
-
-class _LostAndFoundState extends State<LostAndFound> {
-  @override
-  Widget build(BuildContext context) {
-    return TrustedPersonsListView();
   }
 }

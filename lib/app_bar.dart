@@ -6,6 +6,16 @@ class AppBarWidget extends StatelessWidget {
 
   @override
   AppBar build(BuildContext context) {
-    return AppBar(title: Text('Hessentag - $title'));
+    return AppBar(
+      title: Text('Hessentag - $title'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.account_circle, size: 40),
+          onPressed: () {
+            Navigator.pushNamed(context, '/account');
+          },
+        ),
+      ],
+    );
   }
 }
