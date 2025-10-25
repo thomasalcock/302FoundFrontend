@@ -119,12 +119,15 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          final GlobalKey<TrustedPersonFormState> formKey =
+              GlobalKey<TrustedPersonFormState>();
           showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
                 title: const Text('Neue Vertrauensperson hinzufügen'),
                 content: TrustedPersonForm(
+                  key: formKey,
                   onPersonAdded: (person) {
                     _addTrustedPerson(person);
                     Navigator.of(context).pop();
@@ -134,6 +137,12 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text('Abbrechen'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      formKey.currentState?.submitForm();
+                    },
+                    child: const Text('Hinzufügen'),
                   ),
                 ],
               );
