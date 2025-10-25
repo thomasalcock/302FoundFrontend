@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppBarWidget extends StatelessWidget {
   const AppBarWidget({super.key, required this.title});
@@ -15,6 +17,59 @@ class AppBarWidget extends StatelessWidget {
             Navigator.pushNamed(context, '/account');
           },
         ),
+        if (kDebugMode)
+          IconButton(
+            icon: const Icon(Icons.bug_report, size: 36),
+            tooltip: 'Show saved locations (debug)',
+            onPressed: () {
+              showDialog<void>(
+                context: context,
+                builder: (c) => AlertDialog(
+                  title: const Text('Saved locations (bg_loc_queue)'),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: FutureBuilder<List<String>?>(
+                      future: SharedPreferences.getInstance().then(
+                        (prefs) => prefs.getStringList('bg_loc_queue'),
+                      ),
+                      builder: (ctx, snap) {
+                        if (snap.connectionState != ConnectionState.done) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        final list = snap.data ?? <String>[];
+                        if (list.isEmpty) {
+                          return const Text('No saved locations');
+                        }
+                        return Scrollbar(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: list.length,
+                            itemBuilder: (context, index) {
+                              final item = list[list.length - 1 - index];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+                                child: Text(item),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(c),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
       ],
     );
   }
