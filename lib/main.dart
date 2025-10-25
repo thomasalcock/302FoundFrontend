@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'screens/test_screen.dart';
+import 'package:threeotwo_found_frontend/trustedPersons/trusted_persons_list_view.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
@@ -12,11 +11,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Hessentag Fulda 2026',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const LostAndFound(title: 'Hessentag Fulda - Lost and Found'),
     );
+  }
+}
+
+class LostAndFound extends StatefulWidget {
+  const LostAndFound({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<LostAndFound> createState() => _LostAndFoundState();
+}
+
+class _LostAndFoundState extends State<LostAndFound> {
+  @override
+  Widget build(BuildContext context) {
+    return TrustedPersonsListView();
   }
 }
