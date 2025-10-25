@@ -16,7 +16,7 @@ class AccountViewState extends State<AccountView> {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/');
+            Navigator.pop(context);
             ;
           },
           child: const Text('Go Back'),
