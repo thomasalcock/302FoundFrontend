@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:threeotwo_found_frontend/trustedPersons/trusted_persons_list_view.dart';
 
 Future main() async {

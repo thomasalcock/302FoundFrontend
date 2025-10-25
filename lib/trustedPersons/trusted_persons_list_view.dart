@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/app_bar.dart';
+import 'package:threeotwo_found_frontend/models/user.dart';
 import 'package:threeotwo_found_frontend/trustedPersons/trusted_person_form.dart';
-import 'package:threeotwo_found_frontend/trustedPersons/trusted_person.dart';
 
 class TrustedPersonsListView extends StatefulWidget {
   const TrustedPersonsListView({super.key});
@@ -11,7 +11,7 @@ class TrustedPersonsListView extends StatefulWidget {
 }
 
 class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
-  final List<TrustedPerson> _trustedPersons = [];
+  final List<User> _trustedPersons = [];
   bool _isLoading = true;
   bool _isAdding = false;
   int _isDeleting = -1;
@@ -26,14 +26,16 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       _trustedPersons.addAll([
-        TrustedPerson(
-          name: 'Max Mustermann',
-          phoneNumber: '0123456789',
+        User(
+          username: 'max_mustermann',
+          fullname: 'Max Mustermann',
+          phonenumber: '0123456789',
           email: 'max@mustermann.de',
         ),
-        TrustedPerson(
-          name: 'Erika Mustermann',
-          phoneNumber: '9876543210',
+        User(
+          username: 'erika_mustermann',
+          fullname: 'Erika Mustermann',
+          phonenumber: '9876543210',
           email: 'erika@mustermann.de',
         ),
       ]);
@@ -41,7 +43,7 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     });
   }
 
-  Future<void> _addTrustedPerson(TrustedPerson person) async {
+  Future<void> _addTrustedPerson(User person) async {
     setState(() {
       _isAdding = true;
     });
@@ -93,12 +95,12 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.person),
-                      title: Text(person.name),
+                      title: Text(person.fullname),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Tel.: ${person.phoneNumber}'),
+                          Text('Tel.: ${person.phonenumber}'),
                           Text('Mail: ${person.email}'),
                         ],
                       ),

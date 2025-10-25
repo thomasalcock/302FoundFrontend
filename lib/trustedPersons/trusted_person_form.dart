@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:threeotwo_found_frontend/trustedPersons/trusted_person.dart';
+import 'package:threeotwo_found_frontend/models/user.dart';
 
 class TrustedPersonForm extends StatefulWidget {
-  final Function(TrustedPerson) onPersonAdded;
+  final Function(User) onPersonAdded;
 
   const TrustedPersonForm({super.key, required this.onPersonAdded});
 
@@ -18,9 +18,10 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
 
   void submitForm() {
     if (_formKey.currentState!.validate()) {
-      final person = TrustedPerson(
-        name: _nameController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
+      final person = User(
+        username: _nameController.text.trim(),
+        fullname: _nameController.text.trim(),
+        phonenumber: _phoneController.text.trim(),
         email: _emailController.text.trim(),
       );
       widget.onPersonAdded(person);
@@ -66,7 +67,7 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Name der Vertrauensperson',
-                helperText: ' ', // Reserve space for error messages
+                helperText: ' ',
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -80,7 +81,7 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
               controller: _phoneController,
               decoration: const InputDecoration(
                 labelText: 'Telefonnummer',
-                helperText: ' ', // Reserve space for error messages
+                helperText: ' ',
               ),
               keyboardType: TextInputType.phone,
               validator: (value) {
@@ -95,7 +96,7 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
               controller: _emailController,
               decoration: const InputDecoration(
                 labelText: 'E-Mail-Adresse',
-                helperText: ' ', // Reserve space for error messages
+                helperText: ' ',
               ),
               keyboardType: TextInputType.emailAddress,
               validator: _validateEmail,
