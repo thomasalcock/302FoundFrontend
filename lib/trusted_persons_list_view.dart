@@ -13,6 +13,22 @@ class TrustedPersonsListView extends StatefulWidget {
 class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   final List<TrustedPerson> _trustedPersons = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadTrustedPersons();
+  }
+
+  Future<void> _loadTrustedPersons() async {
+    await Future.delayed(const Duration(seconds: 2));
+    setState(() {
+      _trustedPersons.addAll([
+        TrustedPerson(name: 'Max Mustermann', phoneNumber: '0123456789'),
+        TrustedPerson(name: 'Erika Mustermann', phoneNumber: '9876543210'),
+      ]);
+    });
+  }
+
   void _addTrustedPerson(TrustedPerson person) {
     setState(() {
       _trustedPersons.add(person);
