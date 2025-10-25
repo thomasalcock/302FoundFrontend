@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class User {
   final int id;
   final String auth_token;
