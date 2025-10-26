@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:threeotwo_found_frontend/models/user.dart';
+import 'package:threeotwo_found_frontend/logic/models/user.dart';
 
 class TrustedPersonForm extends StatefulWidget {
   final Function(User) onPersonAdded;

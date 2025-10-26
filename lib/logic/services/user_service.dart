@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:threeotwo_found_frontend/models/user.dart';
+import 'package:threeotwo_found_frontend/logic/models/user.dart';
 import 'dart:convert';
 
 final environment = kDebugMode ? 'development' : 'production';

@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_persons_list_view.dart';
 import 'package:threeotwo_found_frontend/gui/account/account_view.dart';
-import 'handler/location_handler.dart' as location_handler;
+import 'logic/handler/location_handler.dart' as location_handler;
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) => location_handler.onStart(service);
