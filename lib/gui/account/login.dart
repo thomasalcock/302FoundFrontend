@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:threeotwo_found_frontend/services/user_service.dart';
-import 'package:threeotwo_found_frontend/trustedPersons/trusted_persons_list_view.dart';
+import 'package:threeotwo_found_frontend/logic/services/user_service.dart';
+import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_persons_list_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
