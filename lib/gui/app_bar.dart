@@ -2,21 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AppBarWidget extends StatelessWidget {
+class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   const AppBarWidget({super.key, required this.title});
   final String title;
 
   @override
-  AppBar build(BuildContext context) {
+  Widget build(BuildContext context) {
     return AppBar(
-      title: Text('Hessentag - $title'),
+      title: Text('Hessentag | $title'),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.account_circle, size: 40),
-          onPressed: () {
-            Navigator.pushNamed(context, '/account');
-          },
-        ),
         if (kDebugMode)
           IconButton(
             icon: const Icon(Icons.bug_report, size: 36),
@@ -69,16 +63,24 @@ class AppBarWidget extends StatelessWidget {
                           }),
                       child: const Text('Delete All'),
                     ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(c),
-                      child: const Text('OK'),
-                    ),
                   ],
                 ),
               );
             },
           ),
+        IconButton(
+          icon: const Icon(Icons.account_circle, size: 40),
+          onPressed: () {
+            final currentRoute = ModalRoute.of(context)?.settings.name;
+            if (currentRoute != '/account') {
+              Navigator.pushNamed(context, '/account');
+            }
+          },
+        ),
       ],
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

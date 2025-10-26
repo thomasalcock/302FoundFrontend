@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:threeotwo_found_frontend/account/modifiable_attribute.dart';
-import 'package:threeotwo_found_frontend/app_bar.dart';
-import 'package:threeotwo_found_frontend/models/user.dart';
-import 'package:threeotwo_found_frontend/services/user_service.dart';
+import 'package:threeotwo_found_frontend/gui/account/modifiable_attribute.dart';
+import 'package:threeotwo_found_frontend/gui/app_bar.dart';
+import 'package:threeotwo_found_frontend/logic/models/user.dart';
+import 'package:threeotwo_found_frontend/logic/services/user_service.dart';
 
 class AccountView extends StatefulWidget {
   const AccountView({super.key});

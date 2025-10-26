@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
+import 'package:threeotwo_found_frontend/logic/services/location_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -183,7 +183,7 @@ class LocationManager {
     };
 
     if (_environment != 'production') {
-      // Save locally in SharedPreferences queue
+      // Save locally in SharedPreferences queue (development)
       final prefs = await SharedPreferences.getInstance();
       final queue = prefs.getStringList('bg_loc_queue') ?? <String>[];
       queue.add(jsonEncode(payload));
@@ -191,30 +191,44 @@ class LocationManager {
       return;
     }
 
-    // Production: send to API, include token if provided
+    // Production: try to upload any queued payloads first, then this one.
     try {
-      final headers = <String, String>{'Content-Type': 'application/json'};
-      if (_apiToken.isNotEmpty) {
-        headers['Authorization'] = 'Bearer $_apiToken';
+      final prefs = await SharedPreferences.getInstance();
+      final queue = prefs.getStringList('bg_loc_queue') ?? <String>[];
+
+      if (queue.isNotEmpty) {
+        final remaining = <String>[];
+        for (final item in queue) {
+          try {
+            final Map<String, dynamic> queuedPayload = jsonDecode(item);
+            final ok = await LocationService.uploadPayload(
+              queuedPayload,
+              apiToken: _apiToken,
+            );
+            if (!ok) {
+              // keep for retry
+              remaining.add(item);
+            }
+          } catch (e) {
+            // malformed or other error — keep for retry
+            remaining.add(item);
+          }
+        }
+        await prefs.setStringList('bg_loc_queue', remaining);
       }
 
-      final resp = await http
-          .post(
-            Uri.parse('$_apiUrl/location'),
-            headers: headers,
-            body: jsonEncode(payload),
-          )
-          .timeout(const Duration(seconds: 12));
-
-      if (resp.statusCode < 200 || resp.statusCode >= 300) {
-        // on failure, persist locally for retry
-        final prefs = await SharedPreferences.getInstance();
-        final queue = prefs.getStringList('bg_loc_queue') ?? <String>[];
-        queue.add(jsonEncode(payload));
-        await prefs.setStringList('bg_loc_queue', queue);
+      // Upload current payload
+      final success = await LocationService.uploadPayload(
+        payload,
+        apiToken: _apiToken,
+      );
+      if (!success) {
+        final q = prefs.getStringList('bg_loc_queue') ?? <String>[];
+        q.add(jsonEncode(payload));
+        await prefs.setStringList('bg_loc_queue', q);
       }
     } catch (e) {
-      // network or timeout -> persist locally
+      // On unexpected error, persist current payload for retry
       final prefs = await SharedPreferences.getInstance();
       final queue = prefs.getStringList('bg_loc_queue') ?? <String>[];
       queue.add(jsonEncode(payload));
