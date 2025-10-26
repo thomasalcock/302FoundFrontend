@@ -1,3 +1,4 @@
+// 302FoundFrontend (2025) - Location handler: background service callbacks and foreground manager.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
@@ -27,6 +28,10 @@ const AndroidNotificationChannel locationNotificationChannel =
     );
 
 @pragma('vm:entry-point')
+/// Background service entry-point (invoked in the background isolate).
+///
+/// Starts a [LocationManager] instance inside the isolate and sets up service
+/// message handlers for foreground/background toggles.
 void onStart(ServiceInstance service) async {
   // Required to use plugins in the background isolate
   DartPluginRegistrant.ensureInitialized();
@@ -63,6 +68,9 @@ void onStart(ServiceInstance service) async {
 }
 
 @pragma('vm:entry-point')
+/// iOS background callback required by the background service plugin.
+///
+/// Returns `true` on success. Minimal wiring is performed here.
 Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
@@ -119,6 +127,10 @@ class LocationManager {
   });
 
   /// Start periodic location updates.
+  ///
+  /// This method is safe to call multiple times; if already running it will
+  /// return early. Each tick attempts to determine the current position and
+  /// hand it to [LocationService.uploadPayload] or queue it locally.
   void start() {
     if (_isRunning) return;
     _isRunning = true;
@@ -145,6 +157,8 @@ class LocationManager {
   }
 
   /// Internal: handles permissions and returns the current position.
+  ///
+  /// Returns a [Position] or throws a [Future.error] describing the failure.
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;

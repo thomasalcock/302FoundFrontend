@@ -1,8 +1,19 @@
+/// 302FoundFrontend (2025) - Trusted persons list UI.
+///
+/// Shows the user's saved emergency/trusted contacts and provides add/delete
+/// functionality. The view uses a simple in-memory list in development; replace
+/// with `TrustService` calls when integrating with backend APIs.
 import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/gui/app_bar.dart';
 import 'package:threeotwo_found_frontend/logic/models/user.dart';
 import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_person_form.dart';
 
+/// TrustedPersonsListView displays the list of saved contacts and actions.
+///
+/// Example:
+/// ```dart
+/// Navigator.push(context, MaterialPageRoute(builder: (_) => TrustedPersonsListView()));
+/// ```
 class TrustedPersonsListView extends StatefulWidget {
   const TrustedPersonsListView({super.key});
 
@@ -10,6 +21,7 @@ class TrustedPersonsListView extends StatefulWidget {
   TrustedPersonsListViewState createState() => TrustedPersonsListViewState();
 }
 
+/// State for [TrustedPersonsListView], holding the in-memory contacts list.
 class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   final List<User> _trustedPersons = [];
   bool _isLoading = true;
@@ -22,6 +34,10 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     _loadTrustedPersons();
   }
 
+  /// Load initial contacts (development stub).
+  ///
+  /// Replace with a call to [TrustService.getTrustsByUserId] or similar when
+  /// backend integration is available.
   Future<void> _loadTrustedPersons() async {
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
@@ -43,6 +59,9 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     });
   }
 
+  /// Add a new trusted person and update the list/UI.
+  ///
+  /// @param person The [User] instance created from the form.
   Future<void> _addTrustedPerson(User person) async {
     setState(() {
       _isAdding = true;
@@ -54,6 +73,9 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     });
   }
 
+  /// Delete the trusted person at [index].
+  ///
+  /// Shows a short loading state while the deletion is simulated.
   Future<void> _deleteTrustedPerson(int index) async {
     setState(() {
       _isDeleting = index;

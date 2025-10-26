@@ -1,3 +1,7 @@
+/// 302FoundFrontend (2025) - Service for Trust (trusted persons) API access.
+///
+/// Provides simple CRUD helpers used by the UI to read and modify trust
+/// relationships. In development mode these methods return local stub data.
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:threeotwo_found_frontend/logic/models/trust.dart';
@@ -8,7 +12,16 @@ final apiUrl = environment == 'production'
     ? const String.fromEnvironment('API_URL', defaultValue: '')
     : 'http://localhost:3000';
 
+/// TrustService contains static helpers for backend operations.
+///
+/// Methods may throw an [Exception] on non-success HTTP responses.
+/// Example usage:
+/// ```dart
+/// final trusts = await TrustService.getTrustsByUserId(currentUserId);
+/// ```
 class TrustService {
+  /// Retrieve all trusts (development: stubbed list).
+  /// @return Future<List<Trust>>
   static Future<List<Trust>> getAllTrusts() async {
     if (environment != "production") {
       return [
@@ -34,6 +47,9 @@ class TrustService {
     }
   }
 
+  /// Get trusts for a specific user.
+  /// @param userId id of the user whose trusts to retrieve.
+  /// @return Future<List<Trust>>
   static Future<List<Trust>> getTrustsByUserId(int userId) async {
     if (environment != "production") {
       return [Trust(id: 1, userId: userId, trusteeId: 2)];
@@ -54,6 +70,9 @@ class TrustService {
     }
   }
 
+  /// Create a new trust relationship.
+  /// @param trust Trust model to create.
+  /// @return Future<Trust> created object from API.
   static Future<Trust> createTrust(Trust trust) async {
     if (environment != "production") {
       return trust;
@@ -77,6 +96,9 @@ class TrustService {
     }
   }
 
+  /// Retrieve a trust by its id.
+  /// @param id Trust id
+  /// @return Future<Trust>
   static Future<Trust> getTrustById(int id) async {
     if (environment != "production") {
       return Trust(id: id, userId: 1, trusteeId: 2);
@@ -96,6 +118,10 @@ class TrustService {
     }
   }
 
+  /// Update a trust by id.
+  /// @param trust updated trust model
+  /// @param id id of trust to update
+  /// @return Future<Trust> updated model from API
   static Future<Trust> updateTrustById(Trust trust, int id) async {
     if (environment != "production") {
       return trust;
@@ -119,6 +145,9 @@ class TrustService {
     }
   }
 
+  /// Delete a trust by id.
+  /// @param id id of trust to delete
+  /// @return Future<void>
   static Future<void> deleteTrustById(int id) async {
     if (environment != "production") {
       return;

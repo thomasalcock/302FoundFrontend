@@ -1,6 +1,19 @@
+/// 302FoundFrontend (2025) - Form widget to collect a trusted person's contact details.
+///
+/// Encapsulates validation and creation of a lightweight [User] instance which
+/// is returned via the [onPersonAdded] callback when the form is submitted.
+///
+/// Example:
+/// ```dart
+/// TrustedPersonForm(onPersonAdded: (user) => trustService.createTrust(...))
+/// ```
 import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/logic/models/user.dart';
 
+/// TrustedPersonForm collects basic data (name, phone, email) and validates it.
+///
+/// When the form is valid, calling [submitForm] builds a [User] object and
+/// passes it to [onPersonAdded].
 class TrustedPersonForm extends StatefulWidget {
   final Function(User) onPersonAdded;
 
@@ -16,6 +29,12 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  /// Validate and submit the form; builds a [User] and calls [onPersonAdded].
+  ///
+  /// Example:
+  /// ```dart
+  /// submitForm();
+  /// ```
   void submitForm() {
     if (_formKey.currentState!.validate()) {
       final person = User(
@@ -28,6 +47,10 @@ class TrustedPersonFormState extends State<TrustedPersonForm> {
     }
   }
 
+  /// Basic email validation used by the form field validator.
+  ///
+  /// @param value candidate email string
+  /// @return error message when invalid, otherwise null
   String? _validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Bitte geben Sie eine E-Mail-Adresse ein.';

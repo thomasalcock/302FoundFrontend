@@ -1,3 +1,13 @@
+/// 302FoundFrontend (2025) - Service: Location API helpers.
+///
+/// Centralizes HTTP access and development stubs for location-related endpoints.
+/// Methods return stubbed data when not running in production to keep the UI
+/// responsive during local development.
+///
+/// Example:
+/// ```dart
+/// final locs = await LocationService.getLocationsByUserId(userId);
+/// ```
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:threeotwo_found_frontend/logic/models/location.dart';
@@ -8,7 +18,13 @@ final apiUrl = environment == 'production'
     ? const String.fromEnvironment('API_URL', defaultValue: '')
     : 'http://localhost:3000';
 
+/// HTTP-backed helpers for location resources.
+///
+/// All methods may throw an [Exception] for non-success HTTP responses.
+/// In development mode the methods return pre-defined local values.
 class LocationService {
+  /// Fetch all locations (development: stub).
+  /// @return Future<List<Location>>
   static Future<List<Location>> getAllLocations() async {
     if (environment != "production") {
       return [
@@ -34,6 +50,9 @@ class LocationService {
     }
   }
 
+  /// Fetch locations for a specific user.
+  /// @param userId id of the user
+  /// @return Future<List<Location>>
   static Future<List<Location>> getLocationsByUserId(int userId) async {
     if (environment != "production") {
       return [
@@ -58,6 +77,9 @@ class LocationService {
     }
   }
 
+  /// Create a new location.
+  /// @param location Location to create
+  /// @return Future<Location> created resource
   static Future<Location> createLocation(Location location) async {
     if (environment != "production") {
       return location;
@@ -84,6 +106,9 @@ class LocationService {
     }
   }
 
+  /// Get a location by id.
+  /// @param id location id
+  /// @return Future<Location>
   static Future<Location> getLocationById(int id) async {
     if (environment != "production") {
       return Location(id: id, userId: 1, latitude: 5200000, longitude: 130000);
@@ -105,6 +130,10 @@ class LocationService {
     }
   }
 
+  /// Update a location by id.
+  /// @param location updated Location model
+  /// @param id id to update
+  /// @return Future<Location>
   static Future<Location> updateLocationById(Location location, int id) async {
     if (environment != "production") {
       return location;
@@ -131,6 +160,9 @@ class LocationService {
     }
   }
 
+  /// Delete a location by id.
+  /// @param id id to delete
+  /// @return Future<void>
   static Future<void> deleteLocationById(int id) async {
     if (environment != "production") {
       return;
@@ -149,6 +181,10 @@ class LocationService {
     }
   }
 
+  /// Upload JSON payload used by background location handler.
+  /// @param payload map containing location data
+  /// @param apiToken optional bearer token
+  /// @return Future<bool> success flag
   static Future<bool> uploadPayload(
     Map<String, dynamic> payload, {
     String? apiToken,

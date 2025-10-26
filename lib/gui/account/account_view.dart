@@ -1,9 +1,22 @@
+/// 302FoundFrontend (2025) - Account UI: view and edit current user attributes.
+///
+/// Contains the account screen which displays the current user's profile and
+/// allows editing fields such as email and phone number via [ModifiableAttribute].
 import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/gui/account/modifiable_attribute.dart';
 import 'package:threeotwo_found_frontend/gui/app_bar.dart';
 import 'package:threeotwo_found_frontend/logic/models/user.dart';
 import 'package:threeotwo_found_frontend/logic/services/user_service.dart';
 
+/// AccountView shows the current user's profile and editable attributes.
+///
+/// The view fetches the current user on init and renders [ModifiableAttribute]
+/// widgets for editable fields.
+///
+/// Example:
+/// ```dart
+/// Navigator.pushNamed(context, '/account');
+/// ```
 class AccountView extends StatefulWidget {
   const AccountView({super.key});
 
@@ -11,6 +24,11 @@ class AccountView extends StatefulWidget {
   AccountViewState createState() => AccountViewState();
 }
 
+/// State backing for [AccountView].
+///
+/// Responsibilities:
+/// - load current user via [UserService.getCurrentUser]
+/// - update individual fields using [UserService.updateUserById]
 class AccountViewState extends State<AccountView> {
   User? _currentUser;
   bool _isLoading = true;
@@ -22,6 +40,11 @@ class AccountViewState extends State<AccountView> {
     _loadCurrentUser();
   }
 
+  /// Fetch the current user and update state.
+  ///
+  /// Uses [UserService.getCurrentUser] and shows a loading indicator while the
+  /// request is in-flight. On error an error message is stored in state.
+  /// @return Future<void>
   Future<void> _loadCurrentUser() async {
     try {
       setState(() {
@@ -37,12 +60,23 @@ class AccountViewState extends State<AccountView> {
       });
     } catch (e) {
       setState(() {
+        // Preserve user-friendly message for UI; do not rethrow here.
         _errorMessage = 'Failed to load user data: $e';
         _isLoading = false;
       });
     }
   }
 
+  /// Update a single user field and persist it via [UserService.updateUserById].
+  ///
+  /// @param field The logical field to update ('email' or 'phone').
+  /// @param newValue The new string value to persist.
+  /// @return Future<void>
+  ///
+  /// Example:
+  /// ```dart
+  /// _updateUserData('email', 'new@example.com');
+  /// ```
   Future<void> _updateUserData(String field, String newValue) async {
     if (_currentUser == null) return;
 
@@ -64,6 +98,7 @@ class AccountViewState extends State<AccountView> {
       }
     } catch (e) {
       if (mounted) {
+        // Surface update failures to the user but keep state stable.
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Failed to update $field: $e')));
