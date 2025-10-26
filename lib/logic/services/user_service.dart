@@ -9,6 +9,34 @@ final apiUrl = environment == 'production'
     : 'http://localhost:3000';
 
 class UserService {
+  static Future<User> getCurrentUser() async {
+    if (environment != "production") {
+      return User(
+        id: 1,
+        username: "current_user",
+        fullname: "Current User",
+        phonenumber: "+123456789",
+        email: "current@example.com",
+        alias: 1001,
+      );
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('$apiUrl/user/current'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(response.statusCode);
+      }
+
+      return User.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      throw Exception('API-Error: $e');
+    }
+  }
+
   static Future<User> createUser(User user) async {
     if (environment != "production") {
       return user;
