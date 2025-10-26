@@ -93,8 +93,6 @@ class AccountViewState extends State<AccountView> {
                   ),
                 ],
               )
-            : _currentUser == null
-            ? Login()
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -127,10 +125,11 @@ class AccountViewState extends State<AccountView> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        _currentUser = null;
-                        UserService.loggedInUser = null;
-                      });
+                      UserService.loggedInUser = null;
+                      if (!mounted) return;
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => const Login()),
+                      );
                     },
                     child: const Text('Ausloggen'),
                   ),
