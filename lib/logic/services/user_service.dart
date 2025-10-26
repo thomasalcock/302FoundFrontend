@@ -32,8 +32,9 @@ class UserService {
     if (environment != "production") {
       final mock = User(
         id: 1,
-        username: username.isNotEmpty ? username : "dev_user",
-        fullname: "Dev User",
+        username: username,
+        fullname:
+            "${username[0].toUpperCase()}${username.substring(1).toLowerCase()}",
         phonenumber: "+000000000",
         email: "$username@local.dev",
         alias: 9999,
