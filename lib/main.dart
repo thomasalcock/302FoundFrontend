@@ -11,6 +11,11 @@ import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_persons_list
 import 'package:threeotwo_found_frontend/gui/account/account_view.dart';
 import 'logic/handler/location_handler.dart' as location_handler;
 
+// Keep a single app-level LocationManager alive so it isn't GC'd and
+// foreground location tracking continues for the life of the app.
+final location_handler.LocationManager _appLocationManager =
+    location_handler.LocationManager();
+
 @pragma('vm:entry-point')
 /// Background service entry-point used by flutter_background_service.
 ///
@@ -81,8 +86,7 @@ Future main() async {
   );
 
   // Start app-level location manager for foreground behaviour.
-  final lm = location_handler.LocationManager();
-  lm.start();
+  _appLocationManager.start();
 
   runApp(const MyApp());
 }
