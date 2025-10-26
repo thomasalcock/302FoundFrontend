@@ -61,16 +61,12 @@ class UserService {
     }
 
     try {
+      final bodyMap = user.toJson();
+      bodyMap.remove('id');
       final response = await http.post(
         Uri.parse('$apiUrl/user'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_name': user.username,
-          'full_name': user.fullname,
-          'phone_number': user.phonenumber,
-          'email': user.email,
-          'alias': user.alias,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       if (response.statusCode != 201) {
@@ -120,16 +116,12 @@ class UserService {
     }
 
     try {
+      final bodyMap = user.toJson();
+      bodyMap.remove('id');
       final response = await http.put(
         Uri.parse('$apiUrl/user/$id'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_name': user.username,
-          'full_name': user.fullname,
-          'phone_number': user.phonenumber,
-          'email': user.email,
-          'alias': user.alias,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       if (response.statusCode != 200) {

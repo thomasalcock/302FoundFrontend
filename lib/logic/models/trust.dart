@@ -21,13 +21,42 @@ class Trust {
 
   /// Create a [Trust] from API JSON.
   ///
-  /// @param json decoded JSON map from backend
-  /// @return Trust instance
+  /// This factory tolerates minor backend variations (numeric values as
+  /// strings, alternative key names) and safely coerces numeric types.
   factory Trust.fromJson(Map<String, dynamic> json) {
-    return Trust(
-      id: json['id'],
-      userId: json['user_id'],
-      trusteeId: json['trustee_id'],
+    int? parseInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      if (v is double) return v.toInt();
+      if (v is String) return int.tryParse(v);
+      return null;
+    }
+
+    dynamic getVal(List<String> keys) {
+      for (var k in keys) {
+        if (json.containsKey(k)) return json[k];
+      }
+      return null;
+    }
+
+    final idVal = parseInt(getVal(['id']));
+    final userIdVal = parseInt(getVal(['user_id', 'userId', 'user']));
+    final trusteeIdVal = parseInt(
+      getVal(['trustee_id', 'trusteeId', 'trustee']),
     );
+
+    if (userIdVal == null || trusteeIdVal == null) {
+      throw Exception('Invalid JSON for Trust: missing required fields');
+    }
+
+    return Trust(id: idVal, userId: userIdVal, trusteeId: trusteeIdVal);
+  }
+
+  /// Convert this [Trust] to a JSON-compatible map using API snake_case keys.
+  /// Used by services when encoding request bodies.
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{'user_id': userId, 'trustee_id': trusteeId};
+    if (id != null) map['id'] = id;
+    return map;
   }
 }

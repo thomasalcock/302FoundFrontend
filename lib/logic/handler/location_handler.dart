@@ -220,7 +220,7 @@ class LocationManager {
               apiToken: _apiToken,
             );
             if (!ok) {
-              // keep for retry
+              // keep for retry to upload to upload it the next time there is an Connection
               remaining.add(item);
             }
           } catch (e) {

@@ -86,14 +86,12 @@ class LocationService {
     }
 
     try {
+      final bodyMap = location.toJson();
+      bodyMap.remove('id');
       final response = await http.post(
         Uri.parse('$apiUrl/location'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_id': location.userId,
-          'latitude': location.latitude,
-          'longitude': location.longitude,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       if (response.statusCode != 201) {
@@ -140,14 +138,12 @@ class LocationService {
     }
 
     try {
+      final bodyMap = location.toJson();
+      bodyMap.remove('id');
       final response = await http.put(
         Uri.parse('$apiUrl/location/$id'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_id': location.userId,
-          'latitude': location.latitude,
-          'longitude': location.longitude,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       if (response.statusCode != 200) {

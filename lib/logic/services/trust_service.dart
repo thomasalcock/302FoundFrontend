@@ -79,13 +79,12 @@ class TrustService {
     }
 
     try {
+      final bodyMap = trust.toJson();
+      bodyMap.remove('id');
       final response = await http.post(
         Uri.parse('$apiUrl/trust'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_id': trust.userId,
-          'trustee_id': trust.trusteeId,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       if (response.statusCode != 201) throw Exception(response.statusCode);
@@ -128,13 +127,12 @@ class TrustService {
     }
 
     try {
+      final bodyMap = trust.toJson();
+      bodyMap.remove('id');
       final response = await http.put(
         Uri.parse('$apiUrl/trust/$id'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user_id': trust.userId,
-          'trustee_id': trust.trusteeId,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       if (response.statusCode != 200) throw Exception(response.statusCode);

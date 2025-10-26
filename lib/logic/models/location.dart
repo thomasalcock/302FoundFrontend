@@ -30,14 +30,50 @@ class Location {
 
   /// Create a [Location] from the API JSON.
   ///
-  /// @param json decoded JSON map from the backend
-  /// @return Location instance
+  /// This factory is resilient to minor backend variations (e.g. numeric values
+  /// as strings, alternative key names) and safely coerces numeric types.
   factory Location.fromJson(Map<String, dynamic> json) {
+    int? parseInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      if (v is double) return v.toInt();
+      if (v is String) return int.tryParse(v);
+      return null;
+    }
+
+    dynamic getVal(List<String> keys) {
+      for (var k in keys) {
+        if (json.containsKey(k)) return json[k];
+      }
+      return null;
+    }
+
+    final idVal = parseInt(getVal(['id']));
+    final userIdVal = parseInt(getVal(['user_id', 'userId', 'user']));
+    final latVal = parseInt(getVal(['latitude', 'lat']));
+    final longVal = parseInt(getVal(['longitude', 'lng', 'long']));
+
+    if (userIdVal == null || latVal == null || longVal == null) {
+      throw Exception('Invalid JSON for Location: missing required fields');
+    }
+
     return Location(
-      id: json['id'],
-      userId: json['user_id'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
+      id: idVal,
+      userId: userIdVal,
+      latitude: latVal,
+      longitude: longVal,
     );
+  }
+
+  /// Convert this [Location] to a JSON-compatible map using API snake_case keys.
+  /// Used by services when encoding request bodies.
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{
+      'user_id': userId,
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+    if (id != null) map['id'] = id;
+    return map;
   }
 }

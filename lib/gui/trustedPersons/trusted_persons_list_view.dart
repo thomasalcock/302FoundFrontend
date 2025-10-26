@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/gui/app_bar.dart';
 import 'package:threeotwo_found_frontend/logic/models/user.dart';
 import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_person_form.dart';
+import 'package:threeotwo_found_frontend/logic/services/trust_service.dart';
+import 'package:threeotwo_found_frontend/logic/services/user_service.dart';
+import 'package:threeotwo_found_frontend/logic/models/trust.dart';
 
 /// TrustedPersonsListView displays the list of saved contacts and actions.
 ///
@@ -28,6 +31,9 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   bool _isAdding = false;
   int _isDeleting = -1;
 
+  /// Map trustee user id -> trust id for quick lookup when deleting.
+  Map<int, int> _trustIdByTrusteeId = {};
+
   @override
   void initState() {
     super.initState();
@@ -39,24 +45,41 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   /// Replace with a call to [TrustService.getTrustsByUserId] or similar when
   /// backend integration is available.
   Future<void> _loadTrustedPersons() async {
-    await Future.delayed(const Duration(seconds: 2));
     setState(() {
-      _trustedPersons.addAll([
-        User(
-          username: 'max_mustermann',
-          fullname: 'Max Mustermann',
-          phonenumber: '0123456789',
-          email: 'max@mustermann.de',
-        ),
-        User(
-          username: 'erika_mustermann',
-          fullname: 'Erika Mustermann',
-          phonenumber: '9876543210',
-          email: 'erika@mustermann.de',
-        ),
-      ]);
-      _isLoading = false;
+      _isLoading = true;
     });
+
+    try {
+      // Prefer fetching the current user via the service.
+      final currentUser = await UserService.getCurrentUser();
+      final currentUserId = currentUser.id;
+      if (currentUserId == null) {
+        throw Exception('Current user id is null');
+      }
+
+      // Load trusts and then fetch trustee users in parallel.
+      final trusts = await TrustService.getTrustsByUserId(currentUserId);
+      final trusteeIds = trusts.map((t) => t.trusteeId).toList();
+      final users = await Future.wait(
+        trusteeIds.map((id) => UserService.getUserById(id)),
+      );
+
+      setState(() {
+        _trustedPersons.clear();
+        _trustedPersons.addAll(users);
+        _trustIdByTrusteeId = {for (var t in trusts) t.trusteeId: t.id ?? 0};
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler beim Laden der Vertrauenspersonen: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   /// Add a new trusted person and update the list/UI.
@@ -66,11 +89,40 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     setState(() {
       _isAdding = true;
     });
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _trustedPersons.add(person);
-      _isAdding = false;
-    });
+
+    try {
+      final currentUser = await UserService.getCurrentUser();
+      final currentUserId = currentUser.id;
+      if (currentUserId == null) throw Exception('Current user id is null');
+
+      // Ensure the trustee user exists (create or return existing).
+      final createdUser = await UserService.createUser(person);
+
+      // Create the Trust relationship.
+      final trust = Trust(
+        id: 0,
+        userId: currentUserId,
+        trusteeId: createdUser.id ?? 0,
+      );
+      final createdTrust = await TrustService.createTrust(trust);
+
+      setState(() {
+        _trustedPersons.add(createdUser);
+        _trustIdByTrusteeId[createdUser.id ?? 0] = createdTrust.id ?? 0;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Fehler beim Hinzufügen der Vertrauensperson: $e'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAdding = false;
+        });
+      }
+    }
   }
 
   /// Delete the trusted person at [index].
@@ -80,11 +132,32 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
     setState(() {
       _isDeleting = index;
     });
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _trustedPersons.removeAt(index);
-      _isDeleting = -1;
-    });
+
+    try {
+      final person = _trustedPersons[index];
+      final trusteeId = person.id;
+      if (trusteeId != null) {
+        final trustId = _trustIdByTrusteeId[trusteeId];
+        if (trustId != null && trustId != 0) {
+          await TrustService.deleteTrustById(trustId);
+        }
+      }
+
+      setState(() {
+        _trustedPersons.removeAt(index);
+        if (trusteeId != null) _trustIdByTrusteeId.remove(trusteeId);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler beim Löschen der Vertrauensperson: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = -1;
+        });
+      }
+    }
   }
 
   @override
