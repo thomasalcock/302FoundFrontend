@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threeotwo_found_frontend/account/login.dart';
 import 'package:threeotwo_found_frontend/account/modifiable_attribute.dart';
 import 'package:threeotwo_found_frontend/app_bar.dart';
 import 'package:threeotwo_found_frontend/models/user.dart';
@@ -43,7 +44,7 @@ class AccountViewState extends State<AccountView> {
     }
   }
 
-  Future<void> _updateUserData(String field, String newValue) async {
+  Future<void> _updateUserAttribute(String attribute, String newValue) async {
     if (_currentUser == null) return;
 
     try {
@@ -51,23 +52,25 @@ class AccountViewState extends State<AccountView> {
         id: _currentUser!.id,
         username: _currentUser!.username,
         fullname: _currentUser!.fullname,
-        phonenumber: field == 'phone' ? newValue : _currentUser!.phonenumber,
-        email: field == 'email' ? newValue : _currentUser!.email,
+        phonenumber: attribute == 'phone'
+            ? newValue
+            : _currentUser!.phonenumber,
+        email: attribute == 'email' ? newValue : _currentUser!.email,
         alias: _currentUser!.alias,
       );
 
-      if (_currentUser!.id != null) {
-        await UserService.updateUserById(updatedUser, _currentUser!.id!);
-        setState(() {
-          _currentUser = updatedUser;
-        });
-      }
+      final user = await UserService.updateUserById(
+        updatedUser,
+        _currentUser!.id!,
+      );
+
+      setState(() {
+        _currentUser = user;
+      });
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Aktualisieren von $field: $e')),
-        );
-      }
+      setState(() {
+        _errorMessage = 'Failed to update user data: $e';
+      });
     }
   }
 
@@ -95,7 +98,7 @@ class AccountViewState extends State<AccountView> {
                 ],
               )
             : _currentUser == null
-            ? const Text('Keine Nutzerdaten verfügbar.')
+            ? Login()
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -114,16 +117,26 @@ class AccountViewState extends State<AccountView> {
                   ModifiableAttribute(
                     label: 'Email',
                     value: _currentUser!.email ?? 'Not set',
-                    onChange: (newValue) {
-                      _updateUserData('email', newValue);
+                    onChange: (newValue) async {
+                      await _updateUserAttribute('email', newValue);
                     },
                   ),
                   ModifiableAttribute(
                     label: 'Telefonnummer',
                     value: _currentUser!.phonenumber ?? 'Not set',
-                    onChange: (newValue) {
-                      _updateUserData('phone', newValue);
+                    onChange: (newValue) async {
+                      await _updateUserAttribute('phone', newValue);
                     },
+                  ),
+                  // logout button here
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentUser = null;
+                      });
+                    },
+                    child: const Text('Ausloggen'),
                   ),
                 ],
               ),

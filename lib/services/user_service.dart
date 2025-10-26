@@ -13,10 +13,10 @@ class UserService {
     if (environment != "production") {
       return User(
         id: 1,
-        username: "current_user",
-        fullname: "Current User",
+        username: "max_mustermann",
+        fullname: "Max Mustermann",
         phonenumber: "+123456789",
-        email: "current@example.com",
+        email: "max@mustermann.de",
         alias: 1001,
       );
     }
