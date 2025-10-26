@@ -19,28 +19,44 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   @override
   void initState() {
     super.initState();
+    // Lifecycle debug to confirm initState runs and the loader is triggered.
+    debugPrint('TrustedPersonsListView: initState called');
     _loadTrustedPersons();
   }
 
   Future<void> _loadTrustedPersons() async {
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _trustedPersons.addAll([
-        User(
-          username: 'max_mustermann',
-          fullname: 'Max Mustermann',
-          phonenumber: '0123456789',
-          email: 'max@mustermann.de',
-        ),
-        User(
-          username: 'erika_mustermann',
-          fullname: 'Erika Mustermann',
-          phonenumber: '9876543210',
-          email: 'erika@mustermann.de',
-        ),
-      ]);
-      _isLoading = false;
-    });
+    try {
+      // Helpful debug output while developing to confirm this runs.
+      debugPrint('TrustedPersonsListView: starting to load trusted persons');
+      await Future.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
+      setState(() {
+        _trustedPersons.addAll([
+          User(
+            username: 'max_mustermann',
+            fullname: 'Max Mustermann',
+            phonenumber: '0123456789',
+            email: 'max@mustermann.de',
+          ),
+          User(
+            username: 'erika_mustermann',
+            fullname: 'Erika Mustermann',
+            phonenumber: '9876543210',
+            email: 'erika@mustermann.de',
+          ),
+        ]);
+        _isLoading = false;
+      });
+    } catch (e) {
+      // Ensure we stop showing the global loading indicator if an error occurs.
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      // Log the error to the console so it's visible during debugging.
+      // Using debugPrint to avoid heavy logs in release builds.
+      debugPrint('Failed to load trusted persons: $e');
+    }
   }
 
   Future<void> _addTrustedPerson(User person) async {

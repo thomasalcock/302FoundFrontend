@@ -9,7 +9,48 @@ final apiUrl = environment == "production"
     : 'http://localhost:3000';
 
 class UserService {
+  static User? loggedInUser;
+
+  static Future<User> login(String username, String password) async {
+    if (loggedInUser != null) return loggedInUser!;
+
+    if (environment != "production") {
+      final mock = User(
+        id: 1,
+        username: username.isNotEmpty ? username : "dev_user",
+        fullname: "Dev User",
+        phonenumber: "+000000000",
+        email: "$username@local.dev",
+        alias: 9999,
+      );
+      loggedInUser = mock;
+      return mock;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$apiUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username, 'password': password}),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Login failed: ${response.statusCode}');
+      }
+
+      final user = User.fromJson(jsonDecode(response.body));
+      loggedInUser = user;
+      return user;
+    } catch (e) {
+      throw Exception('API-Error: $e');
+    }
+  }
+
   static Future<User> getCurrentUser() async {
+    if (loggedInUser != null) {
+      return loggedInUser!;
+    }
+
     if (environment != "production") {
       return User(
         id: 1,

@@ -24,23 +24,23 @@ class AccountViewState extends State<AccountView> {
   }
 
   Future<void> _loadCurrentUser() async {
+    debugPrint('AccountView: _loadCurrentUser start');
     try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-
       final user = await UserService.getCurrentUser();
-
+      if (!mounted) return;
       setState(() {
         _currentUser = user;
+        UserService.loggedInUser = user;
         _isLoading = false;
       });
+      debugPrint('AccountView: _loadCurrentUser success for ${user.username}');
     } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _errorMessage = 'Failed to load user data: $e';
+        _errorMessage = 'Failed to load user: $e';
         _isLoading = false;
       });
+      debugPrint('AccountView: _loadCurrentUser failed: $e');
     }
   }
 
@@ -66,6 +66,7 @@ class AccountViewState extends State<AccountView> {
 
       setState(() {
         _currentUser = user;
+        UserService.loggedInUser = user;
       });
     } catch (e) {
       setState(() {
@@ -89,11 +90,6 @@ class AccountViewState extends State<AccountView> {
                     _errorMessage!,
                     style: const TextStyle(color: Colors.red),
                     textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadCurrentUser,
-                    child: const Text('Erneut versuchen'),
                   ),
                 ],
               )
@@ -128,12 +124,12 @@ class AccountViewState extends State<AccountView> {
                       await _updateUserAttribute('phone', newValue);
                     },
                   ),
-                  // logout button here
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
                         _currentUser = null;
+                        UserService.loggedInUser = null;
                       });
                     },
                     child: const Text('Ausloggen'),
