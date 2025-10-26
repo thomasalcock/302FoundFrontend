@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import 'package:threeotwo_found_frontend/trustedPersons/trusted_persons_list_view.dart';
-import 'package:threeotwo_found_frontend/account/account_view.dart';
+import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_persons_list_view.dart';
+import 'package:threeotwo_found_frontend/gui/account/account_view.dart';
 import 'handler/location_handler.dart' as location_handler;
 
 @pragma('vm:entry-point')
@@ -14,7 +14,6 @@ void onStart(ServiceInstance service) => location_handler.onStart(service);
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) =>
     location_handler.onIosBackground(service);
-
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,12 +26,16 @@ Future main() async {
     final InitializationSettings initSettings = InitializationSettings(
       android: androidInit,
     );
-    await location_handler.flutterLocalNotificationsPlugin.initialize(initSettings);
+    await location_handler.flutterLocalNotificationsPlugin.initialize(
+      initSettings,
+    );
     await location_handler.flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
-        ?.createNotificationChannel(location_handler.locationNotificationChannel);
+        ?.createNotificationChannel(
+          location_handler.locationNotificationChannel,
+        );
   } catch (e, st) {
     // Prevent plugin initialization failures from crashing the app on startup.
     debugPrint('flutter_local_notifications init failed: $e\n$st');

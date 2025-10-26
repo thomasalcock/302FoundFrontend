@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/app_bar.dart';
 import 'package:threeotwo_found_frontend/models/user.dart';
-import 'package:threeotwo_found_frontend/trustedPersons/trusted_person_form.dart';
+import 'package:threeotwo_found_frontend/gui/trustedPersons/trusted_person_form.dart';
 
 class TrustedPersonsListView extends StatefulWidget {
   const TrustedPersonsListView({super.key});
