@@ -1,8 +1,8 @@
 /// 302FoundFrontend (2025) - Trusted persons list UI.
 ///
 /// Shows the user's saved emergency/trusted contacts and provides add/delete
-/// functionality. The view uses a simple in-memory list in development; replace
-/// with `TrustService` calls when integrating with backend APIs.
+/// functionality. The view uses service-backed operations but keeps helpful
+/// development debug output and a lightweight fallback behavior during failures.
 import 'package:flutter/material.dart';
 import 'package:threeotwo_found_frontend/gui/app_bar.dart';
 import 'package:threeotwo_found_frontend/logic/models/user.dart';
@@ -37,19 +37,20 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
   @override
   void initState() {
     super.initState();
+    // Lifecycle debug to confirm initState runs and the loader is triggered.
+    debugPrint('TrustedPersonsListView: initState called');
     _loadTrustedPersons();
   }
 
-  /// Load initial contacts (development stub).
-  ///
-  /// Replace with a call to [TrustService.getTrustsByUserId] or similar when
-  /// backend integration is available.
+  /// Load initial contacts from backend. Falls back to a local stub on error.
   Future<void> _loadTrustedPersons() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
+      debugPrint('TrustedPersonsListView: starting to load trusted persons');
+
       // Prefer fetching the current user via the service.
       final currentUser = await UserService.getCurrentUser();
       final currentUserId = currentUser.id;
@@ -64,15 +65,49 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
         trusteeIds.map((id) => UserService.getUserById(id)),
       );
 
+      if (!mounted) return;
       setState(() {
         _trustedPersons.clear();
         _trustedPersons.addAll(users);
         _trustIdByTrusteeId = {for (var t in trusts) t.trusteeId: t.id ?? 0};
       });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler beim Laden der Vertrauenspersonen: $e')),
+
+      debugPrint(
+        'TrustedPersonsListView: loaded ${users.length} trusted persons',
       );
+    } catch (e) {
+      // If backend loading fails, log and surface a user snackbar, and fall
+      // back to a small local stub so the UI remains usable during development.
+      debugPrint('Failed to load trusted persons from backend: $e');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Laden der Vertrauenspersonen: $e'),
+          ),
+        );
+      }
+
+      // Fallback dev stub to keep the UI functional.
+      if (mounted) {
+        setState(() {
+          _trustedPersons.clear();
+          _trustedPersons.addAll([
+            User(
+              username: 'max_mustermann',
+              fullname: 'Max Mustermann',
+              phonenumber: '0123456789',
+              email: 'max@mustermann.de',
+            ),
+            User(
+              username: 'erika_mustermann',
+              fullname: 'Erika Mustermann',
+              phonenumber: '9876543210',
+              email: 'erika@mustermann.de',
+            ),
+          ]);
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -106,16 +141,20 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
       );
       final createdTrust = await TrustService.createTrust(trust);
 
+      if (!mounted) return;
       setState(() {
         _trustedPersons.add(createdUser);
         _trustIdByTrusteeId[createdUser.id ?? 0] = createdTrust.id ?? 0;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Fehler beim Hinzufügen der Vertrauensperson: $e'),
-        ),
-      );
+      debugPrint('Failed to add trusted person: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Hinzufügen der Vertrauensperson: $e'),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -143,14 +182,20 @@ class TrustedPersonsListViewState extends State<TrustedPersonsListView> {
         }
       }
 
+      if (!mounted) return;
       setState(() {
         _trustedPersons.removeAt(index);
         if (trusteeId != null) _trustIdByTrusteeId.remove(trusteeId);
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler beim Löschen der Vertrauensperson: $e')),
-      );
+      debugPrint('Failed to delete trusted person: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Löschen der Vertrauensperson: $e'),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {

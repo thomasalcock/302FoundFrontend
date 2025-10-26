@@ -38,48 +38,40 @@ class ModifiableAttribute extends StatefulWidget {
 class ModifiableAttributeState extends State<ModifiableAttribute> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(widget.label),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(widget.value),
-            TextButton(
-              onPressed: () {
-                // Show an input dialog. The dialog stores the edited value in a
-                // local variable and only calls onChange when the user confirms.
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    String newValue = widget.value;
-                    return AlertDialog(
-                      title: Text('${widget.label} ändern'),
-                      content: TextField(
-                        onChanged: (value) {
-                          newValue = value;
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Neue ${widget.label} eingeben',
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            // Notify parent of the new value and close dialog.
-                            widget.onChange(newValue);
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('speichern'),
-                        ),
-                      ],
-                    );
-                  },
+        Text(widget.value),
+        TextButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                String newValue = widget.value;
+                return AlertDialog(
+                  title: Text('${widget.label} ändern'),
+                  content: TextField(
+                    onChanged: (value) {
+                      newValue = value;
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Neue ${widget.label} eingeben',
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        widget.onChange(newValue);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('speichern'),
+                    ),
+                  ],
                 );
               },
-              child: Text('ändern'),
-            ),
-          ],
+            );
+          },
+          child: Text('ändern'),
         ),
       ],
     );

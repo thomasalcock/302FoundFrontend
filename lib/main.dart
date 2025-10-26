@@ -1,6 +1,8 @@
 // 302FoundFrontend (2025) - App entry: initializes background service, notifications, and starts the Flutter UI.
 import 'dart:async';
 
+import 'package:threeotwo_found_frontend/gui/account/login.dart';
+import 'package:threeotwo_found_frontend/logic/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -45,7 +47,7 @@ Future<bool> onIosBackground(ServiceInstance service) =>
 /// Example initialization sequence:
 /// ```dart
 /// await main();
-/// ```
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // dotenv removed; use kDebugMode / build-time config instead.
@@ -102,7 +104,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: TrustedPersonsListView(),
+      home: UserService.loggedInUser != null
+          ? const TrustedPersonsListView()
+          : const Login(),
       routes: {'/account': (context) => const AccountView()},
     );
   }
