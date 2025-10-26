@@ -64,9 +64,9 @@ class AccountViewState extends State<AccountView> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to update $field: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Fehler beim Aktualisieren von $field: $e')),
+        );
       }
     }
   }
@@ -90,12 +90,12 @@ class AccountViewState extends State<AccountView> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _loadCurrentUser,
-                    child: const Text('Retry'),
+                    child: const Text('Erneut versuchen'),
                   ),
                 ],
               )
             : _currentUser == null
-            ? const Text('No user data available')
+            ? const Text('Keine Nutzerdaten verfügbar.')
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
