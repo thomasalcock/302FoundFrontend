@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,14 +16,14 @@ class LocationManager {
   bool _isRunning = false;
 
   // Environment / API config
-  final String _environment = dotenv.get(
-    'ENVIRONMENT',
-    fallback: 'development',
-  );
+  final String _environment = kDebugMode ? 'development' : 'production';
   late final String _apiUrl = _environment == 'production'
-      ? dotenv.get('API_URL', fallback: '')
+      ? const String.fromEnvironment('API_URL', defaultValue: '')
       : 'http://localhost:3000';
-  final String _apiToken = dotenv.get('API_TOKEN', fallback: '');
+  final String _apiToken = const String.fromEnvironment(
+    'API_TOKEN',
+    defaultValue: '',
+  );
 
   LocationManager({
     this.interval = const Duration(seconds: 60),

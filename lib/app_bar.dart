@@ -62,6 +62,14 @@ class AppBarWidget extends StatelessWidget {
                   ),
                   actions: [
                     TextButton(
+                      onPressed: () =>
+                          SharedPreferences.getInstance().then((prefs) {
+                            prefs.remove('bg_loc_queue');
+                            Navigator.pop(c);
+                          }),
+                      child: const Text('Delete All'),
+                    ),
+                    TextButton(
                       onPressed: () => Navigator.pop(c),
                       child: const Text('OK'),
                     ),

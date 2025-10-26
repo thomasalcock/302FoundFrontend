@@ -1,11 +1,11 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:threeotwo_found_frontend/models/user.dart';
 import 'dart:convert';
 
-final environment = dotenv.get("ENVIRONMENT");
-final apiUrl = environment == "production"
-    ? dotenv.get("API_URL")
+final environment = kDebugMode ? 'development' : 'production';
+final apiUrl = environment == 'production'
+    ? const String.fromEnvironment('API_URL', defaultValue: '')
     : 'http://localhost:3000';
 
 class UserService {
